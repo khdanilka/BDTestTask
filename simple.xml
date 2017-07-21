@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<staff>
+  <position>
+    <DepCode>ffffff</DepCode>
+    <DepJob>manager4</DepJob>
+    <Description>new descripti</Description>
+  </position>
+  <position>
+    <DepCode>b</DepCode>
+    <DepJob>manager2</DepJob>
+    <Description>best</Description>
+  </position>
+  <position>
+    <DepCode>dddd1</DepCode>
+    <DepJob>manager4</DepJob>
+    <Description>new description</Description>
+  </position>
+  <position>
+    <DepCode>ccccc1</DepCode>
+    <DepJob>manager3</DepJob>
+    <Description>position 1 11111</Description>
+  </position>
+  <position>
+    <DepCode>qqqqq</DepCode>
+    <DepJob>manager4</DepJob>
+    <Description>new description 11111</Description>
+  </position>
+  <position>
+    <DepCode>aaaaaaa12</DepCode>
+    <DepJob>manager222222</DepJob>
+    <Description>of best position</Description>
+  </position>
+</staff>
