@@ -184,7 +184,8 @@ public class DOMParsing {
     private static void xmlWrite(String fileName){
 
         SQLDataBase sqlDataBase = new SQLDataBase();
-        try(FileWriter writer = new FileWriter(fileName, false))
+        //try(FileWriter writer = new FileWriter(fileName, false))
+        try(BufferedWriter writer = new BufferedWriter(new OutputStreamWriter (new FileOutputStream(fileName))))
         {
             sqlDataBase.init();
             ResultSet rs = sqlDataBase.getDataBase();
