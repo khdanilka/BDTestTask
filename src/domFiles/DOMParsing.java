@@ -14,6 +14,8 @@ import database.SQLDataBase;
 import java.sql.SQLException;
 import java.util.Iterator;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
 import org.w3c.dom.NamedNodeMap;
@@ -22,7 +24,20 @@ import org.w3c.dom.NodeList;
 
 public class DOMParsing {
 
+
+    public final static Logger logger = Logger.getLogger(DOMParsing.class);
+
+
     public static void main(String[] args) {
+
+        DOMParsing.logger.debug("Поехали");
+        logger.setLevel(Level.DEBUG);
+
+        Starter starter = new Starter();
+        if (!starter.appInit()) {
+            logger.fatal("Ошибка инициализации приложения");
+            return;
+        }
 
         if (args.length < 2) {
                 System.exit (1);
@@ -34,16 +49,17 @@ public class DOMParsing {
                 sync(args[1]);
                 break;
             case "writeX":
-                xmlWrite("/Users/android/Desktop/BDTestTask/" + args[1]);
+                xmlWrite(args[1]);
                 break;
             default:
+                DOMParsing.logger.fatal("Указаны неверные аргументы в параметрах");
                 System.exit (1);
         }
 
     }
 
-
     private static void sync(String pathName){
+        DOMParsing.logger.debug("Синхронизация БД с xml " + pathName);
         try {
             // Get Document Builder Factory
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -104,18 +120,23 @@ public class DOMParsing {
                 }
 
                 sqlDataBase.executeCommit();
+                DOMParsing.logger.debug("Синхронизация завершена ");
                 sqlDataBase.dispose();
             } catch (SQLException e){
                 sqlDataBase.rollBack(savepoint);
                 sqlDataBase.dispose();
+                DOMParsing.logger.fatal("при связи с БД произошли ошибки", e);
             }
 
         } catch (ParserConfigurationException e) {
             System.out.println("The underlying parser does not support the requested features.");
+            DOMParsing.logger.fatal("при инициализации чтения xml файла ошибки", e);
         } catch (FactoryConfigurationError e) {
             System.out.println("Error occurred obtaining Document Builder Factory.");
+            DOMParsing.logger.fatal("при инициализации чтения xml файла ошибки", e);
         } catch (Exception e) {
             e.printStackTrace();
+            DOMParsing.logger.fatal("при инициализации чтения xml файла ошибки", e);
         }
     }
 
@@ -183,6 +204,7 @@ public class DOMParsing {
 
     private static void xmlWrite(String fileName){
 
+        DOMParsing.logger.debug("Начало записи БД в xml");
         SQLDataBase sqlDataBase = new SQLDataBase();
         //try(FileWriter writer = new FileWriter(fileName, false))
         try(BufferedWriter writer = new BufferedWriter(new OutputStreamWriter (new FileOutputStream(fileName))))
@@ -204,12 +226,13 @@ public class DOMParsing {
 
             writer.write("</staff>");
             writer.flush();
+            DOMParsing.logger.debug("Данные из БД записаны в xml " + fileName);
             sqlDataBase.dispose();
         } catch (SQLException ex) {
-            System.out.println("sql  " + ex.getMessage());
+            DOMParsing.logger.fatal("ошибка при записи в xml", ex);
             sqlDataBase.dispose();
         } catch(IOException ex){
-            System.out.println(ex.getMessage());
+            DOMParsing.logger.fatal("ошибка при записи в xml", ex);
             sqlDataBase.dispose();
         }
 

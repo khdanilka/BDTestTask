@@ -1,5 +1,6 @@
 package database;
 
+import domFiles.DOMParsing;
 import domFiles.Position;
 
 import java.sql.*;
@@ -13,10 +14,13 @@ public class SQLDataBase implements BDConnection {
     @Override
     public void init() {
         try{
+            DOMParsing.logger.debug("Инициализация базы данных");
             Class.forName("org.sqlite.JDBC");
             connection = DriverManager.getConnection("jdbc:sqlite:persons.sqlite");
             statement = connection.createStatement();
         }catch (ClassNotFoundException | SQLException e){
+            DOMParsing.logger.fatal("Ошибка инициализации базы данных",e);
+            DOMParsing.logger.debug(e.getMessage());
             throw new RuntimeException(e);
         }
 
@@ -25,6 +29,7 @@ public class SQLDataBase implements BDConnection {
     @Override
     public void createDB() {
         try {
+            DOMParsing.logger.debug("Создание таблицы в базе данных");
             statement.execute("CREATE TABLE if not exists 'persons' " +
                     "('id' INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     "'DepCode' STRING(20), " +
@@ -32,6 +37,8 @@ public class SQLDataBase implements BDConnection {
                     "'Description' STRING(255));");
 
         } catch (SQLException e) {
+            DOMParsing.logger.fatal("Ошибка создания базы данных",e);
+            DOMParsing.logger.debug(e.getMessage());
             throw new RuntimeException(e);
         }
         System.out.println("Таблица создана или уже существует.");
@@ -42,9 +49,12 @@ public class SQLDataBase implements BDConnection {
     public void clearDB() {
 
         try {
+            DOMParsing.logger.debug("Очищение базы данных");
             statement.execute("DELETE FROM 'persons' ");
 
         } catch (SQLException e) {
+            DOMParsing.logger.fatal("Ошибка очищения базы данных",e);
+            DOMParsing.logger.debug(e.getMessage());
             throw new RuntimeException(e);
         }
 
@@ -54,8 +64,11 @@ public class SQLDataBase implements BDConnection {
     @Override
     public void dispose()  {
         try{
+            DOMParsing.logger.debug("Закрытие соединения с базой данных");
             connection.close();
         } catch (SQLException e){
+            DOMParsing.logger.fatal("Ошибка закрытия соединения с базой данных",e);
+            DOMParsing.logger.debug(e.getMessage());
             throw  new RuntimeException(e);
         }
 
@@ -66,6 +79,7 @@ public class SQLDataBase implements BDConnection {
     }
 
     public void executeCommit() throws SQLException{
+        DOMParsing.logger.debug("Коммит данных");
         connection.commit();
     }
 
@@ -78,6 +92,7 @@ public class SQLDataBase implements BDConnection {
     }
 
     public void updateDataBase(Position position, int primaryKey) throws SQLException{
+        DOMParsing.logger.debug("Обновление элемента в БД по ключу" + primaryKey);
         PreparedStatement ps = null;
         ps = connection.prepareStatement
                 ("UPDATE Persons SET description = ? WHERE id = ?");
@@ -87,6 +102,7 @@ public class SQLDataBase implements BDConnection {
     }
 
     public void deleteFromDataBase(int primaryKey) throws SQLException{
+        DOMParsing.logger.debug("Удаление элемента из БД по ключу" + primaryKey);
         PreparedStatement ps = null;
         ps = connection.prepareStatement
                 ("DELETE FROM Persons WHERE id = ?");
@@ -95,6 +111,7 @@ public class SQLDataBase implements BDConnection {
     }
 
     public void addToDataBase(Position position) throws SQLException{
+        DOMParsing.logger.debug("Добавление нового элемента в БД");
         PreparedStatement ps = null;
         ps = connection.prepareStatement
                 ("INSERT INTO persons (DepCode, DepJob, Description) VALUES(?, ?, ?);");
@@ -124,6 +141,7 @@ public class SQLDataBase implements BDConnection {
     }
 
     public ResultSet getDataBase() throws SQLException{
+        DOMParsing.logger.debug("Получение БД");
         PreparedStatement ps = null;
         ResultSet rs = null;
         ps = connection.prepareStatement ("SELECT * FROM Persons");
